@@ -1,0 +1,25 @@
+name: RDP
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Download ngrok
+        shell: powershell
+        run: |
+          Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+          Expand-Archive ngrok.zip -DestinationPath $PWD
+          $env:PATH += ";$PWD"
+          ./ngrok.exe authtoken 2zQaOBy4QnNy4krJlpnidoZcsrT_Av1R7RxzBYifzk9omXFx
+
+      - name: Enable RDP
+        shell: powershell
+        run: |
+          net user Mido2020	Zxcvbnm1111@@@@ /add
+          net localgroup administrators Mido2020 /add
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          ./ngrok.exe tcp 3389
